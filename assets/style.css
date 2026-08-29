@@ -1,0 +1,271 @@
+/* Application foundation */
+:root {
+    --navy: #0f172a;
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-light: #eff6ff;
+    --slate: #475569;
+    --border: #dbe3ee;
+    --surface: #ffffff;
+    --background: #f4f7fb;
+}
+
+.stApp {
+    background:
+        radial-gradient(
+            circle at 10% 5%,
+            rgba(37, 99, 235, 0.11),
+            transparent 28%
+        ),
+        linear-gradient(145deg, #f8fafc, var(--background));
+}
+
+.block-container {
+    max-width: 760px;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+}
+
+/* Hide Streamlit interface elements */
+header[data-testid="stHeader"] {
+    background: transparent;
+}
+
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"],
+div[data-testid="stStatusWidget"],
+#MainMenu,
+footer {
+    display: none !important;
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 2rem;
+}
+
+.brand-icon {
+    display: flex;
+    width: 54px;
+    height: 54px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: linear-gradient(145deg, var(--blue), var(--blue-dark));
+    color: #ffffff;
+    font-size: 1.7rem;
+    font-weight: 800;
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+}
+
+.app-header h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.app-header p {
+    margin: 5px 0 0;
+    color: var(--slate);
+    font-size: 0.96rem;
+}
+
+/* Tabs */
+button[data-baseweb="tab"] {
+    min-height: 52px;
+    padding-right: 22px;
+    padding-left: 22px;
+    color: var(--slate);
+    font-weight: 700;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: var(--blue);
+}
+
+div[data-baseweb="tab-border"] {
+    background-color: var(--blue);
+}
+
+/* Labels */
+.section-label {
+    margin-top: 1.8rem;
+    margin-bottom: 0.8rem;
+    color: #64748b;
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+label {
+    color: #334155 !important;
+    font-weight: 650 !important;
+}
+
+/* Inputs */
+div[data-baseweb="input"],
+div[data-baseweb="select"] > div {
+    min-height: 52px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+div[data-baseweb="input"]:focus-within,
+div[data-baseweb="select"] > div:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Operation buttons */
+div[data-testid="stHorizontalBlock"]
+div.stButton > button {
+    min-height: 58px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    color: var(--navy);
+    font-size: 1.6rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+div[data-testid="stHorizontalBlock"]
+div.stButton > button:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue);
+    color: var(--blue);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
+}
+
+/* Primary currency button */
+div.stButton > button[kind="primary"] {
+    min-height: 52px;
+    margin-top: 0.7rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 750;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+div.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, var(--blue-dark), #1e40af);
+    color: #ffffff;
+}
+
+/* Results */
+.result-card {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.6rem;
+    padding: 24px;
+    overflow: hidden;
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            140deg,
+            rgba(239, 246, 255, 0.96),
+            rgba(255, 255, 255, 0.98)
+        );
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);
+}
+
+.result-label {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.calculation {
+    margin-top: 12px;
+    color: var(--slate);
+    font-size: 1rem;
+}
+
+.result-card strong {
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+    color: var(--navy);
+    font-size: clamp(2rem, 8vw, 3rem);
+    line-height: 1.2;
+}
+
+.exchange-rate {
+    margin-top: 14px;
+    color: #334155;
+    font-size: 0.92rem;
+    font-weight: 650;
+}
+
+.rate-date {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+div[data-testid="stAlert"] {
+    margin-top: 1.4rem;
+    border-radius: 12px;
+}
+
+/* Responsive mobile layout */
+@media (max-width: 600px) {
+    .block-container {
+        padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .app-header {
+        align-items: flex-start;
+        margin-bottom: 1.3rem;
+    }
+
+    .brand-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        font-size: 1.4rem;
+    }
+
+    .app-header h1 {
+        font-size: 1.65rem;
+    }
+
+    .app-header p {
+        font-size: 0.85rem;
+    }
+
+    button[data-baseweb="tab"] {
+        padding-right: 12px;
+        padding-left: 12px;
+        font-size: 0.86rem;
+    }
+
+    div[data-testid="stHorizontalBlock"]
+    div.stButton > button {
+        min-height: 52px;
+        padding: 0;
+        font-size: 1.35rem;
+    }
+
+    .result-card {
+        padding: 20px;
+    }
+}
