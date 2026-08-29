@@ -29,7 +29,32 @@ def format_number(number):
     return f"{number:,.6f}".rstrip("0").rstrip(".")
 
 
+def calculate_result(operation, first_number, second_number):
+    """Perform the selected arithmetic operation."""
+    if operation == "add":
+        return add(first_number, second_number), "＋"
+
+    if operation == "subtract":
+        return subtract(first_number, second_number), "−"
+
+    if operation == "multiply":
+        return multiply(first_number, second_number), "×"
+
+    return divide(first_number, second_number), "÷"
+
+
 load_css("assets/style.css")
+
+
+# Store the most recent result so it remains visible after reruns.
+if "calculation_result" not in st.session_state:
+    st.session_state.calculation_result = None
+
+if "calculation_expression" not in st.session_state:
+    st.session_state.calculation_expression = None
+
+if "calculation_error" not in st.session_state:
+    st.session_state.calculation_error = None
 
 
 st.markdown(
@@ -57,7 +82,7 @@ with calculator_tab:
         unsafe_allow_html=True,
     )
 
-    first_column, second_column = st.columns(2)
+    first_column, second_column = st.columns(2, gap="medium")
 
     with first_column:
         first_number = st.number_input(
@@ -75,92 +100,139 @@ with calculator_tab:
             key="second_number",
         )
 
-    st.markdown(
-        '<p class="section-label">SELECT OPERATION</p>',
-        unsafe_allow_html=True,
+    # Keep the operation controls and result beside each other.
+    operation_column, result_column = st.columns(
+        [1, 1.25],
+        gap="large",
+        vertical_alignment="top",
     )
-
-    add_column, subtract_column, multiply_column, divide_column = st.columns(4)
 
     selected_operation = None
 
-    with add_column:
-        if st.button(
-            "+",
-            key="add_button",
-            use_container_width=True,
-            help="Addition",
-        ):
-            selected_operation = "add"
+    with operation_column:
+        st.markdown(
+            '<p class="section-label calculation-section-label">'
+            "SELECT OPERATION"
+            "</p>",
+            unsafe_allow_html=True,
+        )
 
-    with subtract_column:
-        if st.button(
-            "−",
-            key="subtract_button",
-            use_container_width=True,
-            help="Subtraction",
-        ):
-            selected_operation = "subtract"
+        # First row of buttons
+        add_column, subtract_column = st.columns(2, gap="small")
 
-    with multiply_column:
-        if st.button(
-            "×",
-            key="multiply_button",
-            use_container_width=True,
-            help="Multiplication",
-        ):
-            selected_operation = "multiply"
+        with add_column:
+            if st.button(
+                "＋",
+                key="add_button",
+                use_container_width=True,
+                help="Add the two numbers",
+            ):
+                selected_operation = "add"
 
-    with divide_column:
-        if st.button(
-            "÷",
-            key="divide_button",
-            use_container_width=True,
-            help="Division",
-        ):
-            selected_operation = "divide"
+        with subtract_column:
+            if st.button(
+                "−",
+                key="subtract_button",
+                use_container_width=True,
+                help="Subtract the second number from the first",
+            ):
+                selected_operation = "subtract"
 
+        # Second row of buttons
+        multiply_column, divide_column = st.columns(2, gap="small")
+
+        with multiply_column:
+            if st.button(
+                "×",
+                key="multiply_button",
+                use_container_width=True,
+                help="Multiply the two numbers",
+            ):
+                selected_operation = "multiply"
+
+        with divide_column:
+            if st.button(
+                "÷",
+                key="divide_button",
+                use_container_width=True,
+                help="Divide the first number by the second",
+            ):
+                selected_operation = "divide"
+
+    # Calculate before displaying the result.
     if selected_operation:
         try:
-            if selected_operation == "add":
-                result = add(first_number, second_number)
-                symbol = "+"
-
-            elif selected_operation == "subtract":
-                result = subtract(first_number, second_number)
-                symbol = "−"
-
-            elif selected_operation == "multiply":
-                result = multiply(first_number, second_number)
-                symbol = "×"
-
-            else:
-                result = divide(first_number, second_number)
-                symbol = "÷"
-
-            st.markdown(
-                f"""
-                <div class="result-card">
-                    <span class="result-label">RESULT</span>
-                    <span class="calculation">
-                        {format_number(first_number)}
-                        {symbol}
-                        {format_number(second_number)}
-                    </span>
-                    <strong>{format_number(result)}</strong>
-                </div>
-                """,
-                unsafe_allow_html=True,
+            result, symbol = calculate_result(
+                selected_operation,
+                first_number,
+                second_number,
             )
 
+            st.session_state.calculation_result = result
+            st.session_state.calculation_expression = (
+                f"{format_number(first_number)} "
+                f"{symbol} "
+                f"{format_number(second_number)}"
+            )
+            st.session_state.calculation_error = None
+
         except ZeroDivisionError:
-            st.error(
+            st.session_state.calculation_result = None
+            st.session_state.calculation_expression = None
+            st.session_state.calculation_error = (
                 "Division by zero is not allowed. "
                 "Enter a non-zero second number."
             )
 
         except (TypeError, ValueError):
-            st.error("Please enter valid numbers and try again.")
+            st.session_state.calculation_result = None
+            st.session_state.calculation_expression = None
+            st.session_state.calculation_error = (
+                "Please enter valid numbers and try again."
+            )
+
+    with result_column:
+        st.markdown(
+            '<p class="section-label calculation-section-label">'
+            "RESULT"
+            "</p>",
+            unsafe_allow_html=True,
+        )
+
+        if st.session_state.calculation_error:
+            st.error(st.session_state.calculation_error)
+
+        elif st.session_state.calculation_result is not None:
+            st.markdown(
+                f"""
+                <div class="result-card side-result">
+                    <span class="result-label">CALCULATION</span>
+                    <span class="calculation">
+                        {st.session_state.calculation_expression}
+                    </span>
+                    <strong>
+                        {format_number(
+                            st.session_state.calculation_result
+                        )}
+                    </strong>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        else:
+            st.markdown(
+                """
+                <div class="result-card side-result empty-result">
+                    <span class="result-label">READY</span>
+                    <strong>0</strong>
+                    <span class="result-help">
+                        Select an operation to calculate.
+                    </span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 
 with currency_tab:
@@ -182,28 +254,37 @@ with currency_tab:
             key="currency_amount",
         )
 
-        source_column, target_column = st.columns(2)
+        source_column, target_column = st.columns(2, gap="medium")
 
         with source_column:
             source_currency = st.selectbox(
                 "From",
                 currency_codes,
                 index=currency_codes.index("USD"),
-                format_func=lambda code: f"{code} · {currencies[code]}",
+                format_func=lambda code: (
+                    f"{code} · {currencies[code]}"
+                ),
             )
 
         with target_column:
-            default_target = "KES" if "KES" in currency_codes else "EUR"
+            default_target = (
+                "KES"
+                if "KES" in currency_codes
+                else "EUR"
+            )
 
             target_currency = st.selectbox(
                 "To",
                 currency_codes,
                 index=currency_codes.index(default_target),
-                format_func=lambda code: f"{code} · {currencies[code]}",
+                format_func=lambda code: (
+                    f"{code} · {currencies[code]}"
+                ),
             )
 
         if st.button(
             "Convert currency",
+            key="convert_currency_button",
             type="primary",
             use_container_width=True,
         ):
@@ -220,17 +301,26 @@ with currency_tab:
             st.markdown(
                 f"""
                 <div class="result-card currency-result">
-                    <span class="result-label">CONVERTED AMOUNT</span>
-                    <span class="calculation">
-                        {format_number(amount)} {source_currency}
+                    <span class="result-label">
+                        CONVERTED AMOUNT
                     </span>
+
+                    <span class="calculation">
+                        {format_number(amount)}
+                        {source_currency}
+                    </span>
+
                     <strong>
-                        {format_number(converted_amount)} {target_currency}
+                        {format_number(converted_amount)}
+                        {target_currency}
                     </strong>
+
                     <span class="exchange-rate">
                         1 {source_currency} =
-                        {format_number(exchange_rate)} {target_currency}
+                        {format_number(exchange_rate)}
+                        {target_currency}
                     </span>
+
                     <span class="rate-date">
                         Rate date: {rate_date}
                     </span>
