@@ -8,7 +8,7 @@ PROJECT OVERVIEW
 
 The application combines a standard arithmetic calculator with a live currency converter. It has a responsive corporate interface suitable for individuals, businesses, dashboards, demonstrations, and authorized POS or fintech integrations.
 
-LIVE DEMO: https://clinntech-calculator.streamlit.app
+LIVE DEMO: https://calculatorke.streamlit.app
 
 FEATURES
 
@@ -197,7 +197,7 @@ Example iframe code
 
 iframe src equals https://clinntech-calculator.streamlit.app/?embed=true
 
-The iframe provides visual access to the calculator. It does not automatically connect the application to transaction data customer records payment processors accounting systems or databases.
+The iframe provides visual access to the calculator. It does not automatically connect the application to transaction data, customer records, payment processors, accounting systems, or databases.
 
 A deeper integration should use a secured API with the following protections.
 
