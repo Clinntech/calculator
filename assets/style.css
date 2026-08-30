@@ -1,6 +1,4 @@
-/* ========================================
-   CALCULATOR DESIGN SYSTEM
-======================================== */
+/*UI Styling*/
 
 :root {
     --navy: #0f172a;
@@ -20,9 +18,7 @@
 }
 
 
-/* ========================================
-   APPLICATION FOUNDATION
-======================================== */
+/*FOUNDATION*/
 
 .stApp {
     background:
@@ -50,9 +46,7 @@
 }
 
 
-/* ========================================
-   HIDE STREAMLIT INTERFACE ELEMENTS
-======================================== */
+/*HIDE STREAMLIT INTERFACE ELEMENTS*/
 
 header[data-testid="stHeader"] {
     background: transparent;
@@ -67,9 +61,7 @@ footer {
 }
 
 
-/* ========================================
-   APPLICATION HEADER
-======================================== */
+/*HEADER*/
 
 .app-header {
     display: flex;
@@ -118,9 +110,7 @@ footer {
 }
 
 
-/* ========================================
-   NAVIGATION TABS
-======================================== */
+/*NAVIGATION TABS*/
 
 button[data-baseweb="tab"] {
     min-height: 48px;
@@ -156,9 +146,7 @@ div[data-baseweb="tab-border"] {
     display: none;
 }
 
-/* ========================================
-   LABELS
-======================================== */
+/*LABELS*/
 
 .section-label {
     margin-top: 1.8rem;
@@ -180,9 +168,7 @@ label {
 }
 
 
-/* ========================================
-   INPUTS AND SELECT MENUS
-======================================== */
+/*INPUTS AND SELECT MENUS*/
 
 div[data-baseweb="input"],
 div[data-baseweb="select"] > div {
@@ -218,9 +204,7 @@ div[data-baseweb="select"] span {
 }
 
 
-/* ========================================
-   OPERATION BUTTON GRID
-======================================== */
+/*OPERATION BUTTON GRID*/
 
 div.st-key-add_button,
 div.st-key-subtract_button,
@@ -309,9 +293,7 @@ div.st-key-divide_button button:active {
 }
 
 
-/* ========================================
-   RESULT DISPLAY
-======================================== */
+/*RESULT*/
 
 .result-card {
     display: flex;
@@ -385,9 +367,7 @@ div.st-key-divide_button button:active {
 }
 
 
-/* ========================================
-   CURRENCY CONVERTER
-======================================== */
+/* CURRENCY CONVERTER */
 
 div.st-key-convert_currency_button button {
     min-height: 54px;
@@ -451,9 +431,7 @@ div.st-key-convert_currency_button button:active {
 }
 
 
-/* ========================================
-   ALERTS AND ERROR MESSAGES
-======================================== */
+/*ALERTS AND ERROR MESSAGES*/
 
 div[data-testid="stAlert"] {
     margin-top: 0;
@@ -466,9 +444,7 @@ div[data-testid="stAlert"] p {
 }
 
 
-/* ========================================
-   TABLET RESPONSIVENESS
-======================================== */
+/*TABLET RESPONSIVENESS*/
 
 @media (max-width: 768px) {
     .block-container {
@@ -490,9 +466,7 @@ div[data-testid="stAlert"] p {
 }
 
 
-/* ========================================
-   MOBILE RESPONSIVENESS
-======================================== */
+/*MOBILE RESPONSIVENESS*/
 
 @media (max-width: 600px) {
     .block-container {
@@ -578,9 +552,7 @@ div[data-testid="stAlert"] p {
 }
 
 
-/* ========================================
-   SMALL MOBILE DEVICES
-======================================== */
+/*SMALL MOBILE DEVICES*/
 
 @media (max-width: 400px) {
     .block-container {
