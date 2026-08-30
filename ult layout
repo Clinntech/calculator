@@ -1,0 +1,1016 @@
+[1mdiff --git a/app.py b/app.py[m
+[1mindex b06a205..1ae8a2f 100644[m
+[1m--- a/app.py[m
+[1m+++ b/app.py[m
+[36m@@ -29,9 +29,34 @@[m [mdef format_number(number):[m
+     return f"{number:,.6f}".rstrip("0").rstrip(".")[m
+ [m
+ [m
+[32m+[m[32mdef calculate_result(operation, first_number, second_number):[m
+[32m+[m[32m    """Perform the selected arithmetic operation."""[m
+[32m+[m[32m    if operation == "add":[m
+[32m+[m[32m        return add(first_number, second_number), "＋"[m
+[32m+[m
+[32m+[m[32m    if operation == "subtract":[m
+[32m+[m[32m        return subtract(first_number, second_number), "−"[m
+[32m+[m
+[32m+[m[32m    if operation == "multiply":[m
+[32m+[m[32m        return multiply(first_number, second_number), "×"[m
+[32m+[m
+[32m+[m[32m    return divide(first_number, second_number), "÷"[m
+[32m+[m
+[32m+[m
+ load_css("assets/style.css")[m
+ [m
+ [m
+[32m+[m[32m# Store the most recent result so it remains visible after reruns.[m
+[32m+[m[32mif "calculation_result" not in st.session_state:[m
+[32m+[m[32m    st.session_state.calculation_result = None[m
+[32m+[m
+[32m+[m[32mif "calculation_expression" not in st.session_state:[m
+[32m+[m[32m    st.session_state.calculation_expression = None[m
+[32m+[m
+[32m+[m[32mif "calculation_error" not in st.session_state:[m
+[32m+[m[32m    st.session_state.calculation_error = None[m
+[32m+[m
+[32m+[m
+ st.markdown([m
+     """[m
+     <div class="app-header">[m
+[36m@@ -57,7 +82,7 @@[m [mwith calculator_tab:[m
+         unsafe_allow_html=True,[m
+     )[m
+ [m
+[31m-    first_column, second_column = st.columns(2)[m
+[32m+[m[32m    first_column, second_column = st.columns(2, gap="medium")[m
+ [m
+     with first_column:[m
+         first_number = st.number_input([m
+[36m@@ -75,93 +100,140 @@[m [mwith calculator_tab:[m
+             key="second_number",[m
+         )[m
+ [m
+[31m-    st.markdown([m
+[31m-        '<p class="section-label">SELECT OPERATION</p>',[m
+[31m-        unsafe_allow_html=True,[m
+[32m+[m[32m    # Keep the operation controls and result beside each other.[m
+[32m+[m[32m    operation_column, result_column = st.columns([m
+[32m+[m[32m        [1, 1.25],[m
+[32m+[m[32m        gap="large",[m
+[32m+[m[32m        vertical_alignment="top",[m
+     )[m
+ [m
+[31m-    add_column, subtract_column, multiply_column, divide_column = st.columns(4)[m
+[31m-[m
+     selected_operation = None[m
+ [m
+[31m-    with add_column:[m
+[31m-        if st.button([m
+[31m-            "+",[m
+[31m-            key="add_button",[m
+[31m-            use_container_width=True,[m
+[31m-            help="Addition",[m
+[31m-        ):[m
+[31m-            selected_operation = "add"[m
+[31m-[m
+[31m-    with subtract_column:[m
+[31m-        if st.button([m
+[31m-            "−",[m
+[31m-            key="subtract_button",[m
+[31m-            use_container_width=True,[m
+[31m-            help="Subtraction",[m
+[31m-        ):[m
+[31m-            selected_operation = "subtract"[m
+[31m-[m
+[31m-    with multiply_column:[m
+[31m-        if st.button([m
+[31m-            "×",[m
+[31m-            key="multiply_button",[m
+[31m-            use_container_width=True,[m
+[31m-            help="Multiplication",[m
+[31m-        ):[m
+[31m-            selected_operation = "multiply"[m
+[31m-[m
+[31m-    with divide_column:[m
+[31m-        if st.button([m
+[31m-            "÷",[m
+[31m-            key="divide_button",[m
+[31m-            use_container_width=True,[m
+[31m-            help="Division",[m
+[31m-        ):[m
+[31m-            selected_operation = "divide"[m
+[32m+[m[32m    with operation_column:[m
+[32m+[m[32m        st.markdown([m
+[32m+[m[32m            '<p class="section-label calculation-section-label">'[m
+[32m+[m[32m            "SELECT OPERATION"[m
+[32m+[m[32m            "</p>",[m
+[32m+[m[32m            unsafe_allow_html=True,[m
+[32m+[m[32m        )[m
+ [m
+[32m+[m[32m        # First row of buttons[m
+[32m+[m[32m        add_column, subtract_column = st.columns(2, gap="small")[m
+[32m+[m
+[32m+[m[32m        with add_column:[m
+[32m+[m[32m            if st.button([m
+[32m+[m[32m                "＋",[m
+[32m+[m[32m                key="add_button",[m
+[32m+[m[32m                use_container_width=True,[m
+[32m+[m[32m                help="Add the two numbers",[m
+[32m+[m[32m            ):[m
+[32m+[m[32m                selected_operation = "add"[m
+[32m+[m
+[32m+[m[32m        with subtract_column:[m
+[32m+[m[32m            if st.button([m
+[32m+[m[32m                "−",[m
+[32m+[m[32m                key="subtract_button",[m
+[32m+[m[32m                use_container_width=True,[m
+[32m+[m[32m                help="Subtract the second number from the first",[m
+[32m+[m[32m            ):[m
+[32m+[m[32m                selected_operation = "subtract"[m
+[32m+[m
+[32m+[m[32m        # Second row of buttons[m
+[32m+[m[32m        multiply_column, divide_column = st.columns(2, gap="small")[m
+[32m+[m
+[32m+[m[32m        with multiply_column:[m
+[32m+[m[32m            if st.button([m
+[32m+[m[32m                "×",[m
+[32m+[m[32m                key="multiply_button",[m
+[32m+[m[32m                use_container_width=True,[m
+[32m+[m[32m                help="Multiply the two numbers",[m
+[32m+[m[32m            ):[m
+[32m+[m[32m                selected_operation = "multiply"[m
+[32m+[m
+[32m+[m[32m        with divide_column:[m
+[32m+[m[32m            if st.button([m
+[32m+[m[32m                "÷",[m
+[32m+[m[32m                key="divide_button",[m
+[32m+[m[32m                use_container_width=True,[m
+[32m+[m[32m                help="Divide the first number by the second",[m
+[32m+[m[32m            ):[m
+[32m+[m[32m                selected_operation = "divide"[m
+[32m+[m
+[32m+[m[32m    # Calculate before displaying the result.[m
+     if selected_operation:[m
+         try:[m
+[31m-            if selected_operation == "add":[m
+[31m-                result = add(first_number, second_number)[m
+[31m-                symbol = "+"[m
+[32m+[m[32m            result, symbol = calculate_result([m
+[32m+[m[32m                selected_operation,[m
+[32m+[m[32m                first_number,[m
+[32m+[m[32m                second_number,[m
+[32m+[m[32m            )[m
+ [m
+[31m-            elif selected_operation == "subtract":[m
+[31m-                result = subtract(first_number, second_number)[m
+[31m-                symbol = "−"[m
+[32m+[m[32m            st.session_state.calculation_result = result[m
+[32m+[m[32m            st.session_state.calculation_expression = ([m
+[32m+[m[32m                f"{format_number(first_number)} "[m
+[32m+[m[32m                f"{symbol} "[m
+[32m+[m[32m                f"{format_number(second_number)}"[m
+[32m+[m[32m            )[m
+[32m+[m[32m            st.session_state.calculation_error = None[m
+[32m+[m
+[32m+[m[32m        except ZeroDivisionError:[m
+[32m+[m[32m            st.session_state.calculation_result = None[m
+[32m+[m[32m            st.session_state.calculation_expression = None[m
+[32m+[m[32m            st.session_state.calculation_error = ([m
+[32m+[m[32m                "Division by zero is not allowed. "[m
+[32m+[m[32m                "Enter a non-zero second number."[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m        except (TypeError, ValueError):[m
+[32m+[m[32m            st.session_state.calculation_result = None[m
+[32m+[m[32m            st.session_state.calculation_expression = None[m
+[32m+[m[32m            st.session_state.calculation_error = ([m
+[32m+[m[32m                "Please enter valid numbers and try again."[m
+[32m+[m[32m            )[m
+ [m
+[31m-            elif selected_operation == "multiply":[m
+[31m-                result = multiply(first_number, second_number)[m
+[31m-                symbol = "×"[m
+[32m+[m[32m    with result_column:[m
+[32m+[m[32m        st.markdown([m
+[32m+[m[32m            '<p class="section-label calculation-section-label">'[m
+[32m+[m[32m            "RESULT"[m
+[32m+[m[32m            "</p>",[m
+[32m+[m[32m            unsafe_allow_html=True,[m
+[32m+[m[32m        )[m
+ [m
+[31m-            else:[m
+[31m-                result = divide(first_number, second_number)[m
+[31m-                symbol = "÷"[m
+[32m+[m[32m        if st.session_state.calculation_error:[m
+[32m+[m[32m            st.error(st.session_state.calculation_error)[m
+ [m
+[32m+[m[32m        elif st.session_state.calculation_result is not None:[m
+             st.markdown([m
+                 f"""[m
+[31m-                <div class="result-card">[m
+[31m-                    <span class="result-label">RESULT</span>[m
+[32m+[m[32m                <div class="result-card side-result">[m
+[32m+[m[32m                    <span class="result-label">CALCULATION</span>[m
+                     <span class="calculation">[m
+[31m-                        {format_number(first_number)}[m
+[31m-                        {symbol}[m
+[31m-                        {format_number(second_number)}[m
+[32m+[m[32m                        {st.session_state.calculation_expression}[m
+                     </span>[m
+[31m-                    <strong>{format_number(result)}</strong>[m
+[32m+[m[32m                    <strong>[m
+[32m+[m[32m                        {format_number([m
+[32m+[m[32m                            st.session_state.calculation_result[m
+[32m+[m[32m                        )}[m
+[32m+[m[32m                    </strong>[m
+                 </div>[m
+                 """,[m
+                 unsafe_allow_html=True,[m
+             )[m
+ [m
+[31m-        except ZeroDivisionError:[m
+[31m-            st.error([m
+[31m-                "Division by zero is not allowed. "[m
+[31m-                "Enter a non-zero second number."[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            st.markdown([m
+[32m+[m[32m                """[m
+[32m+[m[32m                <div class="result-card side-result empty-result">[m
+[32m+[m[32m                    <span class="result-label">READY</span>[m
+[32m+[m[32m                    <strong>0</strong>[m
+[32m+[m[32m                    <span class="result-help">[m
+[32m+[m[32m                        Select an operation to calculate.[m
+[32m+[m[32m                    </span>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m                """,[m
+[32m+[m[32m                unsafe_allow_html=True,[m
+             )[m
+ [m
+[31m-        except (TypeError, ValueError):[m
+[31m-            st.error("Please enter valid numbers and try again.")[m
+[31m-[m
+ [m
+ with currency_tab:[m
+     st.markdown([m
+[36m@@ -182,28 +254,37 @@[m [mwith currency_tab:[m
+             key="currency_amount",[m
+         )[m
+ [m
+[31m-        source_column, target_column = st.columns(2)[m
+[32m+[m[32m        source_column, target_column = st.columns(2, gap="medium")[m
+ [m
+         with source_column:[m
+             source_currency = st.selectbox([m
+                 "From",[m
+                 currency_codes,[m
+                 index=currency_codes.index("USD"),[m
+[31m-                format_func=lambda code: f"{code} · {currencies[code]}",[m
+[32m+[m[32m                format_func=lambda code: ([m
+[32m+[m[32m                    f"{code} · {currencies[code]}"[m
+[32m+[m[32m                ),[m
+             )[m
+ [m
+         with target_column:[m
+[31m-            default_target = "KES" if "KES" in currency_codes else "EUR"[m
+[32m+[m[32m            default_target = ([m
+[32m+[m[32m                "KES"[m
+[32m+[m[32m                if "KES" in currency_codes[m
+[32m+[m[32m                else "EUR"[m
+[32m+[m[32m            )[m
+ [m
+             target_currency = st.selectbox([m
+                 "To",[m
+                 currency_codes,[m
+                 index=currency_codes.index(default_target),[m
+[31m-                format_func=lambda code: f"{code} · {currencies[code]}",[m
+[32m+[m[32m                format_func=lambda code: ([m
+[32m+[m[32m                    f"{code} · {currencies[code]}"[m
+[32m+[m[32m                ),[m
+             )[m
+ [m
+         if st.button([m
+             "Convert currency",[m
+[32m+[m[32m            key="convert_currency_button",[m
+             type="primary",[m
+             use_container_width=True,[m
+         ):[m
+[36m@@ -220,17 +301,26 @@[m [mwith currency_tab:[m
+             st.markdown([m
+                 f"""[m
+                 <div class="result-card currency-result">[m
+[31m-                    <span class="result-label">CONVERTED AMOUNT</span>[m
+[32m+[m[32m                    <span class="result-label">[m
+[32m+[m[32m                        CONVERTED AMOUNT[m
+[32m+[m[32m                    </span>[m
+[32m+[m
+                     <span class="calculation">[m
+[31m-                        {format_number(amount)} {source_currency}[m
+[32m+[m[32m                        {format_number(amount)}[m
+[32m+[m[32m                        {source_currency}[m
+                     </span>[m
+[32m+[m
+                     <strong>[m
+[31m-                        {format_number(converted_amount)} {target_currency}[m
+[32m+[m[32m                        {format_number(converted_amount)}[m
+[32m+[m[32m                        {target_currency}[m
+                     </strong>[m
+[32m+[m
+                     <span class="exchange-rate">[m
+                         1 {source_currency} =[m
+[31m-                        {format_number(exchange_rate)} {target_currency}[m
+[32m+[m[32m                        {format_number(exchange_rate)}[m
+[32m+[m[32m                        {target_currency}[m
+                     </span>[m
+[32m+[m
+                     <span class="rate-date">[m
+                         Rate date: {rate_date}[m
+                     </span>[m
+[1mdiff --git a/assets/style.css b/assets/style.css[m
+[1mindex b1c54e0..0f53009 100644[m
+[1m--- a/assets/style.css[m
+[1m+++ b/assets/style.css[m
+[36m@@ -1,32 +1,59 @@[m
+[31m-/* Application foundation */[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   CALCULATOR DESIGN SYSTEM[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ :root {[m
+     --navy: #0f172a;[m
+[32m+[m[32m    --navy-light: #1e293b;[m
+     --blue: #2563eb;[m
+     --blue-dark: #1d4ed8;[m
+[32m+[m[32m    --blue-deep: #1e40af;[m
+     --blue-light: #eff6ff;[m
+[32m+[m[32m    --blue-soft: #dbeafe;[m
+     --slate: #475569;[m
+[32m+[m[32m    --slate-light: #64748b;[m
+     --border: #dbe3ee;[m
+     --surface: #ffffff;[m
+     --background: #f4f7fb;[m
+[32m+[m[32m    --success: #047857;[m
+[32m+[m[32m    --error: #b91c1c;[m
+ }[m
+ [m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   APPLICATION FOUNDATION[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ .stApp {[m
+     background:[m
+         radial-gradient([m
+             circle at 10% 5%,[m
+[31m-            rgba(37, 99, 235, 0.11),[m
+[32m+[m[32m            rgba(37, 99, 235, 0.12),[m
+             transparent 28%[m
+         ),[m
+[31m-        linear-gradient(145deg, #f8fafc, var(--background));[m
+[32m+[m[32m        radial-gradient([m
+[32m+[m[32m            circle at 90% 90%,[m
+[32m+[m[32m            rgba(14, 165, 233, 0.08),[m
+[32m+[m[32m            transparent 30%[m
+[32m+[m[32m        ),[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            145deg,[m
+[32m+[m[32m            #f8fafc 0%,[m
+[32m+[m[32m            var(--background) 100%[m
+[32m+[m[32m        );[m
+ }[m
+ [m
+ .block-container {[m
+[31m-    max-width: 760px;[m
+[32m+[m[32m    max-width: 820px;[m
+     padding-top: 3rem;[m
+     padding-bottom: 4rem;[m
+ }[m
+ [m
+[31m-/* Hide Streamlit interface elements */[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   HIDE STREAMLIT INTERFACE ELEMENTS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ header[data-testid="stHeader"] {[m
+     background: transparent;[m
+ }[m
+[36m@@ -39,7 +66,11 @@[m [mfooter {[m
+     display: none !important;[m
+ }[m
+ [m
+[31m-/* Header */[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   APPLICATION HEADER[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ .app-header {[m
+     display: flex;[m
+     align-items: center;[m
+[36m@@ -49,127 +80,243 @@[m [mfooter {[m
+ [m
+ .brand-icon {[m
+     display: flex;[m
+[31m-    width: 54px;[m
+[31m-    height: 54px;[m
+[32m+[m[32m    width: 56px;[m
+[32m+[m[32m    height: 56px;[m
+     align-items: center;[m
+     justify-content: center;[m
+     flex-shrink: 0;[m
+[31m-    border-radius: 16px;[m
+[31m-    background: linear-gradient(145deg, var(--blue), var(--blue-dark));[m
+[32m+[m[32m    border: 1px solid rgba(255, 255, 255, 0.35);[m
+[32m+[m[32m    border-radius: 17px;[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            145deg,[m
+[32m+[m[32m            var(--blue),[m
+[32m+[m[32m            var(--blue-dark)[m
+[32m+[m[32m        );[m
+     color: #ffffff;[m
+     font-size: 1.7rem;[m
+     font-weight: 800;[m
+[31m-    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 14px 28px rgba(37, 99, 235, 0.24),[m
+[32m+[m[32m        inset 0 1px 0 rgba(255, 255, 255, 0.25);[m
+ }[m
+ [m
+ .app-header h1 {[m
+     margin: 0;[m
+     color: var(--navy);[m
+     font-size: 2rem;[m
+[32m+[m[32m    font-weight: 800;[m
+     line-height: 1.2;[m
+[32m+[m[32m    letter-spacing: -0.03em;[m
+ }[m
+ [m
+ .app-header p {[m
+     margin: 5px 0 0;[m
+     color: var(--slate);[m
+     font-size: 0.96rem;[m
+[32m+[m[32m    line-height: 1.5;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   NAVIGATION TABS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+[32m+[m[32mdiv[data-baseweb="tab-list"] {[m
+[32m+[m[32m    gap: 8px;[m
+[32m+[m[32m    padding: 5px;[m
+[32m+[m[32m    border: 1px solid var(--border);[m
+[32m+[m[32m    border-radius: 14px;[m
+[32m+[m[32m    background: rgba(255, 255, 255, 0.72);[m
+[32m+[m[32m    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);[m
+ }[m
+ [m
+[31m-/* Tabs */[m
+ button[data-baseweb="tab"] {[m
+[31m-    min-height: 52px;[m
+[32m+[m[32m    min-height: 48px;[m
+     padding-right: 22px;[m
+     padding-left: 22px;[m
+[32m+[m[32m    border-radius: 10px;[m
+     color: var(--slate);[m
+     font-weight: 700;[m
+[32m+[m[32m    transition:[m
+[32m+[m[32m        color 0.2s ease,[m
+[32m+[m[32m        background 0.2s ease;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mbutton[data-baseweb="tab"]:hover {[m
+[32m+[m[32m    background: var(--blue-light);[m
+[32m+[m[32m    color: var(--blue);[m
+ }[m
+ [m
+ button[data-baseweb="tab"][aria-selected="true"] {[m
+[32m+[m[32m    background: var(--surface);[m
+     color: var(--blue);[m
+[32m+[m[32m    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);[m
+ }[m
+ [m
+[32m+[m[32mdiv[data-baseweb="tab-highlight"],[m
+ div[data-baseweb="tab-border"] {[m
+[31m-    background-color: var(--blue);[m
+[32m+[m[32m    display: none;[m
+ }[m
+ [m
+[31m-/* Labels */[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   LABELS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ .section-label {[m
+     margin-top: 1.8rem;[m
+     margin-bottom: 0.8rem;[m
+[31m-    color: #64748b;[m
+[31m-    font-size: 0.73rem;[m
+[32m+[m[32m    color: var(--slate-light);[m
+[32m+[m[32m    font-size: 0.72rem;[m
+     font-weight: 800;[m
+     letter-spacing: 0.12em;[m
+ }[m
+ [m
+[32m+[m[32m.calculation-section-label {[m
+[32m+[m[32m    margin-top: 1.8rem;[m
+[32m+[m[32m    margin-bottom: 0.8rem;[m
+[32m+[m[32m}[m
+[32m+[m
+ label {[m
+     color: #334155 !important;[m
+     font-weight: 650 !important;[m
+ }[m
+ [m
+[31m-/* Inputs */[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   INPUTS AND SELECT MENUS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ div[data-baseweb="input"],[m
+ div[data-baseweb="select"] > div {[m
+     min-height: 52px;[m
+     border: 1px solid var(--border);[m
+     border-radius: 12px;[m
+     background: var(--surface);[m
+[32m+[m[32m    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);[m
+     transition:[m
+         border-color 0.2s ease,[m
+         box-shadow 0.2s ease;[m
+ }[m
+ [m
+[32m+[m[32mdiv[data-baseweb="input"]:hover,[m
+[32m+[m[32mdiv[data-baseweb="select"] > div:hover {[m
+[32m+[m[32m    border-color: #93c5fd;[m
+[32m+[m[32m}[m
+[32m+[m
+ div[data-baseweb="input"]:focus-within,[m
+ div[data-baseweb="select"] > div:focus-within {[m
+     border-color: var(--blue);[m
+     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);[m
+ }[m
+ [m
+[31m-/* Operation buttons */[m
+[31m-div[data-testid="stHorizontalBlock"][m
+[31m-div.stButton > button {[m
+[31m-    min-height: 58px;[m
+[31m-    border: 1px solid var(--border);[m
+[31m-    border-radius: 13px;[m
+[31m-    background: var(--surface);[m
+[32m+[m[32mdiv[data-baseweb="input"] input {[m
+     color: var(--navy);[m
+[31m-    font-size: 1.6rem;[m
+[31m-    font-weight: 700;[m
+[31m-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);[m
+[32m+[m[32m    font-size: 1rem;[m
+[32m+[m[32m    font-weight: 600;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv[data-baseweb="select"] span {[m
+[32m+[m[32m    color: var(--navy);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   OPERATION BUTTON GRID[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+[32m+[m[32mdiv.st-key-add_button,[m
+[32m+[m[32mdiv.st-key-subtract_button,[m
+[32m+[m[32mdiv.st-key-multiply_button,[m
+[32m+[m[32mdiv.st-key-divide_button {[m
+[32m+[m[32m    margin-bottom: 0.35rem;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv.st-key-add_button button,[m
+[32m+[m[32mdiv.st-key-subtract_button button,[m
+[32m+[m[32mdiv.st-key-multiply_button button,[m
+[32m+[m[32mdiv.st-key-divide_button button {[m
+[32m+[m[32m    min-height: 78px !important;[m
+[32m+[m[32m    border: 1px solid var(--border) !important;[m
+[32m+[m[32m    border-radius: 16px !important;[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            145deg,[m
+[32m+[m[32m            #ffffff 0%,[m
+[32m+[m[32m            #f8fbff 100%[m
+[32m+[m[32m        ) !important;[m
+[32m+[m[32m    color: var(--navy) !important;[m
+[32m+[m[32m    font-size: 2.2rem !important;[m
+[32m+[m[32m    font-weight: 800 !important;[m
+[32m+[m[32m    line-height: 1 !important;[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 8px 20px rgba(15, 23, 42, 0.07),[m
+[32m+[m[32m        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;[m
+     transition:[m
+         transform 0.18s ease,[m
+         border-color 0.18s ease,[m
+[32m+[m[32m        background 0.18s ease,[m
+         color 0.18s ease,[m
+[31m-        box-shadow 0.18s ease;[m
+[32m+[m[32m        box-shadow 0.18s ease !important;[m
+ }[m
+ [m
+[31m-div[data-testid="stHorizontalBlock"][m
+[31m-div.stButton > button:hover {[m
+[31m-    transform: translateY(-2px);[m
+[31m-    border-color: var(--blue);[m
+[31m-    color: var(--blue);[m
+[31m-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);[m
+[32m+[m[32m/* Keep operation symbols visible */[m
+[32m+[m[32mdiv.st-key-add_button button p,[m
+[32m+[m[32mdiv.st-key-subtract_button button p,[m
+[32m+[m[32mdiv.st-key-multiply_button button p,[m
+[32m+[m[32mdiv.st-key-divide_button button p {[m
+[32m+[m[32m    margin: 0 !important;[m
+[32m+[m[32m    color: inherit !important;[m
+[32m+[m[32m    font-size: 2.2rem !important;[m
+[32m+[m[32m    font-weight: 800 !important;[m
+[32m+[m[32m    line-height: 1 !important;[m
+ }[m
+ [m
+[31m-/* Primary currency button */[m
+[31m-div.stButton > button[kind="primary"] {[m
+[31m-    min-height: 52px;[m
+[31m-    margin-top: 0.7rem;[m
+[31m-    border: none;[m
+[31m-    border-radius: 12px;[m
+[31m-    background: linear-gradient(135deg, var(--blue), var(--blue-dark));[m
+[31m-    color: #ffffff;[m
+[31m-    font-size: 1rem;[m
+[31m-    font-weight: 750;[m
+[31m-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);[m
+[32m+[m[32m/* Operation button hover state */[m
+[32m+[m[32mdiv.st-key-add_button button:hover,[m
+[32m+[m[32mdiv.st-key-subtract_button button:hover,[m
+[32m+[m[32mdiv.st-key-multiply_button button:hover,[m
+[32m+[m[32mdiv.st-key-divide_button button:hover {[m
+[32m+[m[32m    transform: translateY(-3px);[m
+[32m+[m[32m    border-color: var(--blue) !important;[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            145deg,[m
+[32m+[m[32m            var(--blue-light) 0%,[m
+[32m+[m[32m            var(--blue-soft) 100%[m
+[32m+[m[32m        ) !important;[m
+[32m+[m[32m    color: var(--blue-dark) !important;[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 15px 28px rgba(37, 99, 235, 0.17),[m
+[32m+[m[32m        0 0 0 3px rgba(37, 99, 235, 0.07) !important;[m
+ }[m
+ [m
+[31m-div.stButton > button[kind="primary"]:hover {[m
+[31m-    background: linear-gradient(135deg, var(--blue-dark), #1e40af);[m
+[31m-    color: #ffffff;[m
+[32m+[m[32m/* Operation button focus state */[m
+[32m+[m[32mdiv.st-key-add_button button:focus,[m
+[32m+[m[32mdiv.st-key-subtract_button button:focus,[m
+[32m+[m[32mdiv.st-key-multiply_button button:focus,[m
+[32m+[m[32mdiv.st-key-divide_button button:focus {[m
+[32m+[m[32m    border-color: var(--blue) !important;[m
+[32m+[m[32m    color: var(--blue-dark) !important;[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 0 0 4px rgba(37, 99, 235, 0.14) !important;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/* Operation button pressed state */[m
+[32m+[m[32mdiv.st-key-add_button button:active,[m
+[32m+[m[32mdiv.st-key-subtract_button button:active,[m
+[32m+[m[32mdiv.st-key-multiply_button button:active,[m
+[32m+[m[32mdiv.st-key-divide_button button:active {[m
+[32m+[m[32m    transform: translateY(0);[m
+[32m+[m[32m    background: var(--blue-soft) !important;[m
+ }[m
+ [m
+[31m-/* Results */[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   RESULT DISPLAY[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ .result-card {[m
+     display: flex;[m
+     flex-direction: column;[m
+[36m@@ -177,19 +324,27 @@[m [mdiv.stButton > button[kind="primary"]:hover {[m
+     padding: 24px;[m
+     overflow: hidden;[m
+     border: 1px solid #bfdbfe;[m
+[31m-    border-radius: 16px;[m
+[32m+[m[32m    border-radius: 17px;[m
+     background:[m
+         linear-gradient([m
+             140deg,[m
+[31m-            rgba(239, 246, 255, 0.96),[m
+[32m+[m[32m            rgba(239, 246, 255, 0.98),[m
+             rgba(255, 255, 255, 0.98)[m
+         );[m
+[31m-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 14px 32px rgba(15, 23, 42, 0.07),[m
+[32m+[m[32m        inset 0 1px 0 rgba(255, 255, 255, 0.8);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.side-result {[m
+[32m+[m[32m    min-height: 174px;[m
+[32m+[m[32m    margin-top: 0;[m
+[32m+[m[32m    justify-content: center;[m
+ }[m
+ [m
+ .result-label {[m
+[31m-    color: #64748b;[m
+[31m-    font-size: 0.72rem;[m
+[32m+[m[32m    color: var(--slate-light);[m
+[32m+[m[32m    font-size: 0.7rem;[m
+     font-weight: 800;[m
+     letter-spacing: 0.12em;[m
+ }[m
+[36m@@ -198,14 +353,92 @@[m [mdiv.stButton > button[kind="primary"]:hover {[m
+     margin-top: 12px;[m
+     color: var(--slate);[m
+     font-size: 1rem;[m
+[32m+[m[32m    font-weight: 600;[m
+ }[m
+ [m
+ .result-card strong {[m
+     margin-top: 5px;[m
+     overflow-wrap: anywhere;[m
+     color: var(--navy);[m
+[31m-    font-size: clamp(2rem, 8vw, 3rem);[m
+[32m+[m[32m    font-size: clamp(2rem, 7vw, 3rem);[m
+[32m+[m[32m    font-weight: 800;[m
+     line-height: 1.2;[m
+[32m+[m[32m    letter-spacing: -0.03em;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.empty-result {[m
+[32m+[m[32m    border-style: dashed;[m
+[32m+[m[32m    border-color: #cbd5e1;[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            145deg,[m
+[32m+[m[32m            rgba(248, 250, 252, 0.98),[m
+[32m+[m[32m            rgba(239, 246, 255, 0.96)[m
+[32m+[m[32m        );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.empty-result strong {[m
+[32m+[m[32m    color: #94a3b8;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.result-help {[m
+[32m+[m[32m    margin-top: 10px;[m
+[32m+[m[32m    color: var(--slate-light);[m
+[32m+[m[32m    font-size: 0.85rem;[m
+[32m+[m[32m    line-height: 1.4;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   CURRENCY CONVERTER[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+[32m+[m[32mdiv.st-key-convert_currency_button button {[m
+[32m+[m[32m    min-height: 54px;[m
+[32m+[m[32m    margin-top: 0.8rem;[m
+[32m+[m[32m    border: none !important;[m
+[32m+[m[32m    border-radius: 13px !important;[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            135deg,[m
+[32m+[m[32m            var(--blue),[m
+[32m+[m[32m            var(--blue-dark)[m
+[32m+[m[32m        ) !important;[m
+[32m+[m[32m    color: #ffffff !important;[m
+[32m+[m[32m    font-size: 1rem !important;[m
+[32m+[m[32m    font-weight: 750 !important;[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 11px 25px rgba(37, 99, 235, 0.23) !important;[m
+[32m+[m[32m    transition:[m
+[32m+[m[32m        transform 0.18s ease,[m
+[32m+[m[32m        box-shadow 0.18s ease,[m
+[32m+[m[32m        background 0.18s ease !important;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv.st-key-convert_currency_button button p {[m
+[32m+[m[32m    color: #ffffff !important;[m
+[32m+[m[32m    font-weight: 750 !important;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv.st-key-convert_currency_button button:hover {[m
+[32m+[m[32m    transform: translateY(-2px);[m
+[32m+[m[32m    background:[m
+[32m+[m[32m        linear-gradient([m
+[32m+[m[32m            135deg,[m
+[32m+[m[32m            var(--blue-dark),[m
+[32m+[m[32m            var(--blue-deep)[m
+[32m+[m[32m        ) !important;[m
+[32m+[m[32m    color: #ffffff !important;[m
+[32m+[m[32m    box-shadow:[m
+[32m+[m[32m        0 15px 30px rgba(37, 99, 235, 0.3) !important;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv.st-key-convert_currency_button button:active {[m
+[32m+[m[32m    transform: translateY(0);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.currency-result {[m
+[32m+[m[32m    margin-top: 1.6rem;[m
+ }[m
+ [m
+ .exchange-rate {[m
+[36m@@ -217,30 +450,69 @@[m [mdiv.stButton > button[kind="primary"]:hover {[m
+ [m
+ .rate-date {[m
+     margin-top: 5px;[m
+[31m-    color: #64748b;[m
+[32m+[m[32m    color: var(--slate-light);[m
+     font-size: 0.78rem;[m
+ }[m
+ [m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   ALERTS AND ERROR MESSAGES[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ div[data-testid="stAlert"] {[m
+[31m-    margin-top: 1.4rem;[m
+[31m-    border-radius: 12px;[m
+[32m+[m[32m    margin-top: 0;[m
+[32m+[m[32m    border-radius: 13px;[m
+[32m+[m[32m    font-size: 0.9rem;[m
+ }[m
+ [m
+[31m-/* Responsive mobile layout */[m
+[32m+[m[32mdiv[data-testid="stAlert"] p {[m
+[32m+[m[32m    line-height: 1.5;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   TABLET RESPONSIVENESS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+[32m+[m[32m@media (max-width: 768px) {[m
+[32m+[m[32m    .block-container {[m
+[32m+[m[32m        max-width: 700px;[m
+[32m+[m[32m        padding-right: 1.25rem;[m
+[32m+[m[32m        padding-left: 1.25rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-add_button button,[m
+[32m+[m[32m    div.st-key-subtract_button button,[m
+[32m+[m[32m    div.st-key-multiply_button button,[m
+[32m+[m[32m    div.st-key-divide_button button {[m
+[32m+[m[32m        min-height: 72px !important;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    .side-result {[m
+[32m+[m[32m        min-height: 162px;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   MOBILE RESPONSIVENESS[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+ @media (max-width: 600px) {[m
+     .block-container {[m
+[31m-        padding: 1.5rem 1rem 2.5rem;[m
+[32m+[m[32m        padding: 1.4rem 1rem 2.5rem;[m
+     }[m
+ [m
+     .app-header {[m
+         align-items: flex-start;[m
+[32m+[m[32m        gap: 12px;[m
+         margin-bottom: 1.3rem;[m
+     }[m
+ [m
+     .brand-icon {[m
+[31m-        width: 46px;[m
+[31m-        height: 46px;[m
+[31m-        border-radius: 13px;[m
+[32m+[m[32m        width: 47px;[m
+[32m+[m[32m        height: 47px;[m
+[32m+[m[32m        border-radius: 14px;[m
+         font-size: 1.4rem;[m
+     }[m
+ [m
+[36m@@ -249,23 +521,103 @@[m [mdiv[data-testid="stAlert"] {[m
+     }[m
+ [m
+     .app-header p {[m
+[31m-        font-size: 0.85rem;[m
+[32m+[m[32m        max-width: 260px;[m
+[32m+[m[32m        font-size: 0.84rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div[data-baseweb="tab-list"] {[m
+[32m+[m[32m        gap: 3px;[m
+[32m+[m[32m        padding: 4px;[m
+     }[m
+ [m
+     button[data-baseweb="tab"] {[m
+[31m-        padding-right: 12px;[m
+[31m-        padding-left: 12px;[m
+[31m-        font-size: 0.86rem;[m
+[32m+[m[32m        min-height: 44px;[m
+[32m+[m[32m        padding-right: 11px;[m
+[32m+[m[32m        padding-left: 11px;[m
+[32m+[m[32m        font-size: 0.84rem;[m
+     }[m
+ [m
+[31m-    div[data-testid="stHorizontalBlock"][m
+[31m-    div.stButton > button {[m
+[31m-        min-height: 52px;[m
+[31m-        padding: 0;[m
+[31m-        font-size: 1.35rem;[m
+[32m+[m[32m    .section-label,[m
+[32m+[m[32m    .calculation-section-label {[m
+[32m+[m[32m        margin-top: 1.35rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div[data-baseweb="input"],[m
+[32m+[m[32m    div[data-baseweb="select"] > div {[m
+[32m+[m[32m        min-height: 49px;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-add_button button,[m
+[32m+[m[32m    div.st-key-subtract_button button,[m
+[32m+[m[32m    div.st-key-multiply_button button,[m
+[32m+[m[32m    div.st-key-divide_button button {[m
+[32m+[m[32m        min-height: 66px !important;[m
+[32m+[m[32m        border-radius: 14px !important;[m
+[32m+[m[32m        font-size: 1.85rem !important;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-add_button button p,[m
+[32m+[m[32m    div.st-key-subtract_button button p,[m
+[32m+[m[32m    div.st-key-multiply_button button p,[m
+[32m+[m[32m    div.st-key-divide_button button p {[m
+[32m+[m[32m        font-size: 1.85rem !important;[m
+     }[m
+ [m
+     .result-card {[m
+         padding: 20px;[m
+[32m+[m[32m        border-radius: 15px;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    .side-result {[m
+[32m+[m[32m        min-height: 145px;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    .result-card strong {[m
+[32m+[m[32m        font-size: 2rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-convert_currency_button button {[m
+[32m+[m[32m        min-height: 51px;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/* ========================================[m
+[32m+[m[32m   SMALL MOBILE DEVICES[m
+[32m+[m[32m======================================== */[m
+[32m+[m
+[32m+[m[32m@media (max-width: 400px) {[m
+[32m+[m[32m    .block-container {[m
+[32m+[m[32m        padding-right: 0.75rem;[m
+[32m+[m[32m        padding-left: 0.75rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    .app-header p {[m
+[32m+[m[32m        max-width: 220px;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    button[data-baseweb="tab"] {[m
+[32m+[m[32m        padding-right: 8px;[m
+[32m+[m[32m        padding-left: 8px;[m
+[32m+[m[32m        font-size: 0.78rem;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-add_button button,[m
+[32m+[m[32m    div.st-key-subtract_button button,[m
+[32m+[m[32m    div.st-key-multiply_button button,[m
+[32m+[m[32m    div.st-key-divide_button button {[m
+[32m+[m[32m        min-height: 60px !important;[m
+[32m+[m[32m        font-size: 1.7rem !important;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    div.st-key-add_button button p,[m
+[32m+[m[32m    div.st-key-subtract_button button p,[m
+[32m+[m[32m    div.st-key-multiply_button button p,[m
+[32m+[m[32m    div.st-key-divide_button button p {[m
+[32m+[m[32m        font-size: 1.7rem !important;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    .side-result {[m
+[32m+[m[32m        min-height: 135px;[m
+     }[m
+ }[m
+\ No newline at end of file[m

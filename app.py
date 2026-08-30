@@ -254,24 +254,35 @@ with currency_tab:
             key="currency_amount",
         )
 
-        source_column, target_column = st.columns(2, gap="medium")
+        source_column, target_column = st.columns(
+            2,
+            gap="medium",
+        )
 
         with source_column:
+            default_source = (
+                "USD"
+                if "USD" in currency_codes
+                else currency_codes[0]
+            )
+
             source_currency = st.selectbox(
                 "From",
                 currency_codes,
-                index=currency_codes.index("USD"),
+                index=currency_codes.index(default_source),
                 format_func=lambda code: (
                     f"{code} · {currencies[code]}"
                 ),
+                key="source_currency",
             )
 
         with target_column:
-            default_target = (
-                "KES"
-                if "KES" in currency_codes
-                else "EUR"
-            )
+            if "KES" in currency_codes:
+                default_target = "KES"
+            elif "EUR" in currency_codes:
+                default_target = "EUR"
+            else:
+                default_target = currency_codes[0]
 
             target_currency = st.selectbox(
                 "To",
@@ -280,6 +291,7 @@ with currency_tab:
                 format_func=lambda code: (
                     f"{code} · {currencies[code]}"
                 ),
+                key="target_currency",
             )
 
         if st.button(
@@ -298,41 +310,37 @@ with currency_tab:
             exchange_rate = conversion["exchange_rate"]
             rate_date = conversion["date"]
 
+            result_html = (
+                '<div class="result-card currency-result">'
+                '<span class="result-label">CONVERTED AMOUNT</span>'
+                f'<span class="calculation">'
+                f'{format_number(amount)} {source_currency}'
+                '</span>'
+                f'<strong>'
+                f'{format_number(converted_amount)} {target_currency}'
+                '</strong>'
+                f'<span class="exchange-rate">'
+                f'1 {source_currency} = '
+                f'{format_number(exchange_rate)} {target_currency}'
+                '</span>'
+                f'<span class="rate-date">'
+                f'Rate updated: {rate_date}'
+                '</span>'
+                '</div>'
+            )
+
             st.markdown(
-                f"""
-                <div class="result-card currency-result">
-                    <span class="result-label">
-                        CONVERTED AMOUNT
-                    </span>
-
-                    <span class="calculation">
-                        {format_number(amount)}
-                        {source_currency}
-                    </span>
-
-                    <strong>
-                        {format_number(converted_amount)}
-                        {target_currency}
-                    </strong>
-
-                    <span class="exchange-rate">
-                        1 {source_currency} =
-                        {format_number(exchange_rate)}
-                        {target_currency}
-                    </span>
-
-                    <span class="rate-date">
-                        Rate date: {rate_date}
-                    </span>
-                </div>
-                """,
+                result_html,
                 unsafe_allow_html=True,
             )
 
     except ConnectionError as error:
         st.error(str(error))
 
-    except Exception:
+    except ValueError as error:
+        st.error(str(error))
+
+    except Exception as error:
         st.error(
             "The currency service is temporarily unavailable. "
             "Please try again later."

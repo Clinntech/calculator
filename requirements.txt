@@ -1,3 +1,4 @@
 streamlit==1.49.1
 pytest==8.4.2
 requests==2.32.5
+pycountry==24.6.1

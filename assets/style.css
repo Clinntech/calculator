@@ -122,43 +122,39 @@ footer {
    NAVIGATION TABS
 ======================================== */
 
-div[data-baseweb="tab-list"] {
-    gap: 8px;
-    padding: 5px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
-}
-
 button[data-baseweb="tab"] {
     min-height: 48px;
-    padding-right: 22px;
-    padding-left: 22px;
-    border-radius: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: transparent;
     color: var(--slate);
     font-weight: 700;
     transition:
         color 0.2s ease,
-        background 0.2s ease;
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 button[data-baseweb="tab"]:hover {
-    background: var(--blue-light);
+    border-color: #bfdbfe;
+    background: rgba(239, 246, 255, 0.8);
     color: var(--blue);
 }
 
 button[data-baseweb="tab"][aria-selected="true"] {
-    background: var(--surface);
+    border-color: #bfdbfe;
+    background: #ffffff;
     color: var(--blue);
-    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
 }
 
 div[data-baseweb="tab-highlight"],
 div[data-baseweb="tab-border"] {
     display: none;
 }
-
 
 /* ========================================
    LABELS
